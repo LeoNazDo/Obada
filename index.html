@@ -86,6 +86,56 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        /* New CSS for Overlay */
+        #overlay-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dark overlay */
+            backdrop-filter: blur(8px); /* Blur effect on background content */
+            -webkit-backdrop-filter: blur(8px); /* For Safari support */
+            z-index: 1000;
+            display: flex; /* Use flexbox to center content */
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none; /* Prevents interaction when hidden */
+            transition: opacity 0.5s ease-out; /* Smooth fade in/out */
+        }
+
+        #overlay-page.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #overlay-page .overlay-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem; /* rounded-lg */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-2xl */
+            max-width: 500px; /* max-w-lg */
+            width: 90%; /* w-11/12 */
+            text-align: center;
+            transform: scale(0.9); /* Initial smaller scale */
+            opacity: 0; /* Initial hidden state */
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out; /* Smooth transition for content */
+        }
+
+        #overlay-page.active .overlay-content {
+            transform: scale(1); /* Scale to normal size */
+            opacity: 1; /* Fade in */
+        }
+
+        /* CSS for main content animation */
+        main.main-content-shifted {
+            transform: translateX(-100%); /* Slide out to the left */
+            opacity: 0;
+            pointer-events: none; /* Disable interaction with hidden content */
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+        }
     </style>
 </head>
 <body class="bg-stone-100 text-gray-800">
@@ -94,7 +144,7 @@
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <h1 class="text-xl md:text-2xl font-bold text-indigo-700">دعم ذوي المفقودين عالميًا (تقرير تحليلي)</h1>
+                    <h1 class="text-lg md:text-xl font-bold text-indigo-700">دعم ذوي المفقودين عالميًا (تقرير تحليلي)</h1>
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4 space-x-reverse">
@@ -105,6 +155,8 @@
                         <a href="#organizations" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="organizations">المنظمات</a>
                         <a href="#experiences" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="experiences">تجارب دولية</a>
                         <a href="#detailed-support-exploration" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="detailed-support-exploration">استكشاف الدعم بالتفصيل</a>
+                        <a href="#" id="open-overlay-btn" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100">حول التقرير</a>
+                        <a href="#sources" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="sources">المصادر</a>
                     </div>
                 </div>
                  <div class="md:hidden">
@@ -116,6 +168,8 @@
                         <option value="organizations">المنظمات</option>
                         <option value="experiences">تجارب دولية</option>
                         <option value="detailed-support-exploration">استكشاف الدعم بالتفصيل</option>
+                        <option value="open-overlay">حول التقرير</option>
+                        <option value="sources">المصادر</option>
                     </select>
                 </div>
             </div>
@@ -301,30 +355,131 @@
                 </button>
                 <div id="explore-output" class="mt-6 p-4 bg-indigo-50 rounded-md text-gray-800 border border-indigo-200 hidden">
                     <p id="explore-result" class="whitespace-pre-wrap"></p>
-                     <div id="explore-loading" class="text-center text-indigo-600 mt-4 hidden">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-                        <p>جاري استكشاف التفاصيل...</p>
-                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- New Sources Section -->
+        <section id="sources" class="py-12 md:py-16 bg-stone-50 rounded-lg my-8 section-hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-indigo-800">المصادر</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+                    قائمة بالمصادر التي تم الاعتماد عليها في إعداد هذا التقرير التحليلي.
+                </p>
+            </div>
+            <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+                <ul class="list-decimal list-inside text-gray-700 text-right space-y-2">
+                    <li>ICRC. (2014). The Missing: A Global Problem.</li>
+                    <li>ICMP. (n.d.). Missing Persons and Their Families.</li>
+                    <li>ICRC. (2016). The Missing: A Global Challenge.</li>
+                    <li>ICRC. (2018). The Missing: A Guide for Families.</li>
+                    <li>ICRC. (2019). The Missing: A Guide for Practitioners.</li>
+                    <li>UN. (2006). International Convention for the Protection of All Persons from Enforced Disappearance.</li>
+                    <li>ICMP. (n.d.). Rights of the Families of the Missing.</li>
+                    <li>UN. (2007). Basic Principles and Guidelines on the Right to a Remedy and Reparation for Victims of Gross Violations of International Human Rights Law and Serious Violations of International Humanitarian Law.</li>
+                    <li>UN. (2010). Report of the Special Rapporteur on the promotion and protection of the right to freedom of opinion and expression.</li>
+                    <li>Charity Navigator. (n.d.). Honor Card.</li>
+                    <li>Wikipedia. (n.d.). Honor Card.</li>
+                    <li>Merriam-Webster. (n.d.). Honor Card.</li>
+                    <li>Cambridge Dictionary. (n.d.). Honor Card.</li>
+                    <li>Oxford Learner's Dictionaries. (n.d.). Honor Card.</li>
+                    <li>Syrian Arab News Agency (SANA). (2017). Legislative Decree No. 86.</li>
+                    <li>Syrian Arab News Agency (SANA). (2019). Legislative Decree No. 13.</li>
+                    <li>ICRC. (2020). Syria: Missing Persons.</li>
+                    <li>ICRC. (2021). Syria: Families of Missing Persons.</li>
+                    <li>UN. (2022). Independent Institution on Missing Persons in the Syrian Arab Republic.</li>
+                    <li>Syrian Arab News Agency (SANA). (2023). Presidential Decree No. 19.</li>
+                    <li>Syrian Arab News Agency (SANA). (2023). National Commission for Missing Persons.</li>
+                    <li>Iraqi Martyrs Foundation. (2016). Law No. 2 of 2016.</li>
+                    <li>Iraqi Martyrs Foundation. (2024). Law No. 23 of 2024.</li>
+                    <li>ICMP. (2018). The Role of ICMP in Transitional Justice.</li>
+                    <li>ICRC. (2019). Iraq: Missing Persons.</li>
+                    <li>Law 1448 of 2011 (Colombia).</li>
+                    <li>Law 19123 of 1992 (Chile).</li>
+                    <li>Law 24411 (Argentina).</li>
+                    <li>Law 24043 (Argentina).</li>
+                    <li>Syrian Arab News Agency (SANA). (n.d.). Legislative Decree No. 11.</li>
+                    <li>Iraqi Ministry of Education. (2020). Ministerial Decision No. 45.</li>
+                    <li>Iraqi Ministry of Finance. (2020). Ministerial Decision No. 54.</li>
+                    <li>Amnesty International. (2007). Algeria: The Disappeared.</li>
+                    <li>Human Rights Watch. (2010). Algeria: No Justice for the Disappeared.</li>
+                    <li>FIDH. (2012). Algeria: The Continuing Impunity.</li>
+                    <li>ICRC. (2015). Algeria: Missing Persons.</li>
+                    <li>UN. (2007). Report of the Working Group on Enforced or Involuntary Disappearances.</li>
+                    <li>Law 975 of 2005 (Colombia).</li>
+                    <li>Dube, O., & Vargas, J. F. (2013). The Effect of Reparations on Health and Economic Outcomes.</li>
+                    <li>Law 1513 of 2012 (Colombia).</li>
+                    <li>Colombian Ministry of Health. (n.d.). PAPSIVI Program.</li>
+                    <li>PRAIS Program. (n.d.). About PRAIS.</li>
+                    <li>Chilean Ministry of Justice. (n.d.). Reparations Program.</li>
+                    <li>Lebanese National Commission for Missing and Forcibly Disappeared Persons. (2018). Law 105/2018.</li>
+                    <li>UN Human Rights Office. (n.d.). Working Group on Enforced or Involuntary Disappearances.</li>
+                    <li>UNSMIL. (2020). Libya: Missing Persons Law.</li>
+                    <li>Lebanese National Commission for Missing and Forcibly Disappeared Persons. (n.d.). About Us.</li>
+                    <li>UNHCR. (2021). Lebanon: Social Safety Nets.</li>
+                    <li>World Bank. (2022). Lebanon: Social Protection.</li>
+                    <li>CONADEP. (1984). Nunca Más.</li>
+                    <li>Abuelas de Plaza de Mayo. (n.d.). Our Work.</li>
+                    <li>IFFAMPAC/FOM. (n.d.). About Us.</li>
+                    <li>IFFAMPAC/FOM. (n.d.). Our Mission.</li>
+                    <li>ICTJ. (2019). Lebanon: Transitional Justice.</li>
+                    <li>AFSC. (2020). Lebanon: Emergency Relief.</li>
+                    <li>ICMP. (n.d.). Families and Civil Society.</li>
+                    <li>ICMP. (n.d.). DNA Identification.</li>
+                    <li>Iraqi Martyrs Foundation. (n.d.). Inquiry for Missing Persons.</li>
+                    <li>ICTJ. (2015). Chile’s Reparations Program.</li>
+                    <li>Comisión Nacional de Verdad y Reconciliación. (1991). Rettig Report.</li>
+                    <!-- New sources from search results -->
+                    <li>SNHR. (2025). The Death of 2818 Civilians Including 201 Children and 194 Women, and 17 Deaths due to Torture Recorded in the First Half of 2025.</li>
+                    <li>Justice Info. (2025). Syria's Missing Persons Commission and the Risk of Marginalization (Part 2).</li>
+                    <li>UN Geneva. (2025). 'We all have someone missing': Families of the thousands of Syrians 'disappeared' by Assad regime share stories of loss.</li>
+                    <li>Families for Freedom. (n.d.). We want our loved ones back.</li>
+                    <li>The OWP. (2025). Enforced Disappearances In Colombia: Accountability, Transitional Justice, And The Struggle For Peace.</li>
+                    <li>Human Rights Watch. (2014). Dispatches: Algeria's 'Disappeared'.</li>
+                    <li>MENA Rights Group. (2023). Joint statement: truth and justice for the disappeared in Algeria.</li>
+                    <li>Anadolu Ajansı. (2025). Mexico denies involvement of officials in enforced disappearances crisis.</li>
+                    <li>OFFICE ON MISSING PERSONS (Sri Lanka). (n.d.). OMP Units.</li>
+                    <li>OHCHR. (2025). In Dialogue with Peru, Experts of the Committee on Enforced Disappearances Ask Questions on the 2024 Law on Crimes against Humanity and its Impact on Investigations into Enforced Disappearances.</li>
+                    <li>ICRC. (n.d.). El Salvador.</li>
+                    <li>Cyprus Detectives. (n.d.). Missing Persons.</li>
+                    <li>Sarajevo Times. (2025). Missing Persons during the War in BiH: The fate of around 7600 Victims is still unknown.</li>
+                    <li>Front Line Defenders. (n.d.). Mutual Support Group | Front Line Defenders (Guatemala).</li>
+                    <li>Missing Persons Platform. (n.d.). National Network of the Families of the Disappeared, and Missing Nepal (NEFAD).</li>
+                </ul>
+            </div>
+        </section>
+
     </main>
-    <footer class="bg-gray-800 text-white text-center p-4 mt-8">
-        <p>تم إنشاء هذا التطبيق التفاعلي لتسهيل فهم قضية دعم ذوي المفقودين. المعلومات مستمدة من تقرير بحثي شامل.</p>
+    <footer class="bg-gray-800 text-white text-center p-2 mt-8 fixed bottom-0 left-0 right-0 z-40">
+        <p class="text-sm">الهيئة الوطنية للمفقودين</p>
+        <p class="text-xs">تم إنشاء هذا التطبيق التفاعلي لتسهيل فهم قضية دعم ذوي المفقودين. المعلومات مستمدة من تقرير بحثي شامل.</p>
     </footer>
 
-    <script>
-        console.log("Script started."); // Log to confirm script execution starts
+    <!-- New Overlay Page Structure -->
+    <div id="overlay-page">
+        <div class="overlay-content">
+            <h2 class="text-3xl md:text-4xl font-bold text-indigo-800 mb-4">حول التقرير</h2>
+            <p class="text-xl text-gray-700 mb-6">الهيئة الوطنية للمفقودين - دعم ذوي المفقودين عالميًا (تقرير تحليلي)</p>
+            <p class="text-gray-600 mb-8">
+                هذا الملف هو جزء من جهود الهيئة الوطنية للمفقودين لتقديم تحليل شامل ودعم ذوي المفقودين حول العالم، مع التركيز على الأطر القانونية، والبرامج الحكومية وغير الحكومية، والتجارب الدولية.
+            </p>
+            <button id="close-overlay-btn" class="bg-indigo-600 text-white py-2 px-6 rounded-md font-semibold text-lg hover:bg-indigo-700 transition duration-300 ease-in-out shadow-lg">
+                إغلاق
+            </button>
+        </div>
+    </div>
 
-        // Wait until the DOM is fully loaded before running scripts
+    <script>
+        console.log("Script started."); // سجل لتأكيد بدء تنفيذ السكريبت
+
+        // انتظر حتى يتم تحميل DOM بالكامل قبل تشغيل السكريبتات
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOMContentLoaded event fired. Starting script execution."); // Log to confirm DOMContentLoaded event
+            console.log("DOMContentLoaded event fired. Starting script execution."); // سجل لتأكيد حدث DOMContentLoaded
 
             const sections = {};
             document.querySelectorAll('main > section').forEach(section => {
                 sections[section.id] = section;
-                console.log(`Registered section: ${section.id}`); // Log registered section
+                console.log(`Registered section: ${section.id}`); // سجل القسم المسجل
             });
 
             // Ensure all sections are hidden initially
@@ -337,6 +492,11 @@
 
             const navLinks = document.querySelectorAll('.nav-link');
             const mobileNav = document.getElementById('mobile-nav');
+            const openOverlayBtn = document.getElementById('open-overlay-btn');
+            const closeOverlayBtn = document.getElementById('close-overlay-btn');
+            const overlayPage = document.getElementById('overlay-page');
+            const mainContent = document.querySelector('main');
+
 
             function updateActiveNav(activeSectionId) {
                 navLinks.forEach(link => {
@@ -348,15 +508,15 @@
             }
             
             function showSection(sectionId) {
-                console.log('Attempting to show section:', sectionId); // Log attempt to show section
+                console.log('Attempting to show section:', sectionId); // سجل محاولة إظهار القسم
                 for (const id in sections) {
                     if (sections.hasOwnProperty(id)) {
                         if (id === sectionId) {
-                            sections[id].style.display = 'block'; // Set display directly to block
-                            console.log(`Section ${id} is now VISIBLE.`); // Log that section is visible
+                            sections[id].style.display = 'block'; // تعيين العرض مباشرة إلى block
+                            console.log(`Section ${id} is now VISIBLE.`); // سجل أن القسم مرئي
                         } else {
-                            sections[id].style.display = 'none'; // Set display directly to none
-                            console.log(`Section ${id} is now HIDDEN.`); // Log that section is hidden
+                            sections[id].style.display = 'none'; // تعيين العرض مباشرة إلى none
+                            console.log(`Section ${id} is now HIDDEN.`); // سجل أن القسم مخفي
                         }
                     }
                 }
@@ -375,8 +535,16 @@
             if (mobileNav) {
                 mobileNav.addEventListener('change', (e) => {
                      const sectionId = e.target.value;
-                     showSection(sectionId);
-                     window.history.pushState({section: sectionId}, '', `#${sectionId}`);
+                     // Handle the special case for the overlay button
+                     if (sectionId === 'open-overlay') {
+                         openOverlayBtn.click(); // Simulate click on the overlay button
+                         // Reset the select to the current active section so it doesn't stick on 'open-overlay'
+                         const currentActiveSection = document.querySelector('.nav-active')?.dataset.section || 'hero';
+                         mobileNav.value = currentActiveSection;
+                     } else {
+                         showSection(sectionId);
+                         window.history.pushState({section: sectionId}, '', `#${sectionId}`);
+                     }
                 });
             }
 
@@ -392,33 +560,33 @@
             const initialSection = window.location.hash.substring(1) || 'hero';
             showSection(initialSection);
 
-            // Data for the support comparison table
+            // Data for the support comparison table - UPDATED based on strict governmental criteria
             const supportData = {
-                labels: ['العراق', 'سوريا', 'كولومبيا', 'تشيلي', 'الأرجنتين', 'الجزائر', 'لبنان'],
+                labels: ['العراق', 'سوريا', 'كولومبيا', 'تشيلي', 'الأرجنتين', 'الجزائر', 'لبنان', 'المكسيك', 'سريلانكا', 'غواتيمالا'],
                 datasets: [
                     {
                         label: 'الدعم المالي (تعويضات/رواتب)',
-                        data: [1, 1, 1, 1, 1, 1, 0],
+                        data: [1, 1, 1, 1, 1, 1, 0, 0, 0, 0], // Syria: 1
                         key: 'financial'
                     },
                     {
                         label: 'الدعم التعليمي (منح/إعفاءات)',
-                        data: [1, 1, 0, 1, 0, 0, 0],
+                        data: [1, 0, 0, 1, 0, 0, 0, 0, 0, 0], // Syria: 0
                         key: 'education'
                     },
                     {
                         label: 'الرعاية الصحية والنفسية',
-                        data: [0, 1, 1, 1, 0, 0, 0],
+                        data: [0, 0, 1, 1, 0, 0, 0, 0, 1, 0], // Syria: 0
                         key: 'health'
                     },
                     {
                         label: 'دعم التوظيف',
-                        data: [1, 1, 0, 0, 0, 0, 0],
+                        data: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Syria: 0
                         key: 'employment'
                     },
                     {
                         label: 'الضمانات القانونية',
-                        data: [1, 1, 1, 1, 1, 0, 1],
+                        data: [1, 0, 1, 1, 1, 1, 1, 0, 1, 0], // Syria: 0
                         key: 'legal'
                     },
                 ]
@@ -535,47 +703,68 @@
             }
 
 
+            // Updated Experiences Data with new countries and civilian focus
             const experiencesData = [
                 {
                     country: "الأرجنتين",
-                    summary: "تجربة رائدة في العدالة الانتقالية. تأسيس لجنة الحقيقة (CONADEP)، برنامج تعويضات شامل، ودور حاسم للمجتمع المدني (جدات بلازا دي مايو) في إنشاء قاعدة بيانات جينية لتحديد هوية الأطفال المختطفين.",
+                    summary: "تجربة رائدة في العدالة الانتقالية. تأسيس لجنة الحقيقة (CONADEP)، برنامج تعويضات شامل، ودور حاسم للمجتمع المدني (جدات بلازا دي مايو) في إنشاء قاعدة بيانات جينية لتحديد هوية الأطفال المختطفين. الآلاف من المدنيين اختفوا قسريًا.",
                     color: "bg-sky-600",
                     icon: "🇦🇷"
                 },
                 {
                     country: "كولومبيا",
-                    summary: "إطار قانوني قوي لمواجهة آثار النزاع المسلح الطويل. قوانين للتعويضات (قانون الضحايا)، ورعاية نفسية واجتماعية، وآلية لإعلان الغياب بسبب الاختفاء لتسهيل الأمور القانونية على العائلات.",
+                    summary: "إطار قانوني قوي لمواجهة آثار النزاع المسلح الطويل. قوانين للتعويضات (قانون الضحايا)، ورعاية نفسية واجتماعية، وآلية لإعلان الغياب بسبب الاختفاء لتسهيل الأمور القانونية على العائلات. جهود مكثفة للبحث عن المفقودين المدنيين.",
                      color: "bg-amber-500",
                      icon: "🇨🇴"
                 },
                 {
                     country: "تشيلي",
-                    summary: "برنامج جبر شامل بعد فترة الحكم العسكري. قدم تعويضات مالية مرتفعة، ومعاشات شهرية، ومزايا تعليمية وصحية واسعة (برنامج PRAIS)، بالإضافة إلى جهود لتحديد الهوية عبر الحمض النووي.",
+                    summary: "برنامج جبر شامل بعد فترة الحكم العسكري. قدم تعويضات مالية مرتفعة، ومعاشات شهرية، ومزايا تعليمية وصحية واسعة (برنامج PRAIS)، بالإضافة إلى جهود لتحديد الهوية عبر الحمض النووي. ركزت الجهود على ضحايا مدنيين للاختفاء القسري والتعذيب.",
                      color: "bg-red-600",
-                     icon: "🇨🇱"
+                     icon: " 🇱"
                 },
                 {
                     country: "لبنان",
-                    summary: "إرث ثقيل من الحرب الأهلية. تم إنشاء الهيئة الوطنية للمفقودين والمخفيين قسراً بموجب القانون 105، لكن فعاليتها تواجه تحديات بسبب الأزمات السياسية والاقتصادية والاعتماد الكبير على المجتمع المدني.",
+                    summary: "إرث ثقيل من الحرب الأهلية. تم إنشاء الهيئة الوطنية للمفقودين والمخفيين قسراً بموجب القانون 105، لكن فعاليتها تواجه تحديات بسبب الأزمات السياسية والاقتصادية والاعتماد الكبير على المجتمع المدني. العديد من المفقودين مدنيون.",
                      color: "bg-green-600",
                      icon: "🇱🇧"
                 },
                 {
                     country: "الجزائر",
-                    summary: "بعد الحرب الأهلية، قدمت الدولة تعويضات مالية للعائلات. لكن العملية واجهت تحديات، حيث ارتبطت التعويضات غالبًا بالحصول على شهادات وفاة، وأعاقت قوانين العفو جهود المساءلة والبحث عن الحقيقة.",
+                    summary: "بعد الحرب الأهلية، قدمت الدولة تعويضات مالية للعائلات. لكن العملية واجهت تحديات، حيث ارتبطت التعويضات غالبًا بالحصول على شهادات وفاة، وأعاقت قوانين العفو جهود المساءلة والبحث عن الحقيقة. الآلاف من المدنيين اختفوا خلال التسعينيات.",
                      color: "bg-emerald-700",
                      icon: "🇩🇿"
                 },
                  {
                     country: "العراق",
-                    summary: "آليات متعددة للتعامل مع ملف المفقودين من حروب وعمليات إرهابية مختلفة. مؤسسة الشهداء تقدم مزايا واسعة للعائلات بعد إعلان الوفاة، وتعمل دائرة الطب العدلي على تحديد الهوية مجانًا.",
+                    summary: "آليات متعددة للتعامل مع ملف المفقودين من حروب وعمليات إرهابية مختلفة. مؤسسة الشهداء تقدم مزايا واسعة للعائلات بعد إعلان الوفاة، وتعمل دائرة الطب العدلي على تحديد الهوية مجانًا. يشمل أعدادًا كبيرة من المدنيين المفقودين.",
                      color: "bg-gray-700",
                      icon: "🇮🇶"
+                },
+                {
+                    country: "المكسيك",
+                    summary: "تواجه المكسيك أزمة متصاعدة في حالات الاختفاء القسري، مع أكثر من 120,000 شخص مفقود، غالبيتهم العظمى من المدنيين. تُكافح العائلات ومنظمات المجتمع المدني لكشف الحقيقة في ظل تحديات كبيرة وإنكار حكومي.",
+                    color: "bg-purple-600",
+                    icon: "🇲🇽"
+                },
+                {
+                    country: "سريلانكا",
+                    summary: "تأسيس مكتب شؤون المفقودين (OMP) لتقديم الدعم الشامل للعائلات، بما في ذلك الدعم النفسي والاجتماعي. جهود مستمرة لتحديد هوية الآلاف من المدنيين المفقودين من النزاعات السابقة.",
+                    color: "bg-teal-600",
+                    icon: "🇱🇰"
+                },
+                {
+                    country: "غواتيمالا",
+                    summary: "لعبت مجموعات الدعم المتبادل (GAM) دورًا حيويًا في المطالبة بالعدالة والحقيقة للمدنيين المختفين قسريًا خلال النزاع المسلح الداخلي. لا تزال الجهود مستمرة في مواجهة التحديات القانونية والسياسية.",
+                    color: "bg-orange-600",
+                    icon: "🇬🇹"
                 }
             ];
 
             const experiencesGrid = document.getElementById('experiences-grid');
             if (experiencesGrid) {
+                // Clear existing cards before adding new ones
+                experiencesGrid.innerHTML = ''; 
                 experiencesData.forEach(exp => {
                     const card = document.createElement('div');
                     card.className = 'card-flip h-64 cursor-pointer';
@@ -602,16 +791,91 @@
                 console.error("Experiences grid with ID 'experiences-grid' not found. Experiences section will not be populated."); // Log missing experiences grid
             }
 
-            // Detailed Support Exploration Section Logic (using Gemini API)
+            // Detailed Support Exploration Section Logic (using static data)
             const countrySelect = document.getElementById('country-select');
             const supportTypeSelect = document.getElementById('support-type-select');
             const exploreSupportBtn = document.getElementById('explore-support-btn');
             const exploreOutputDiv = document.getElementById('explore-output');
             const exploreResultP = document.getElementById('explore-result');
-            const exploreLoading = document.getElementById('explore-loading'); // Get the loading div
+            // Removed exploreLoading as it's no longer needed for static data
 
-            if (countrySelect && supportTypeSelect && exploreSupportBtn && exploreOutputDiv && exploreResultP && exploreLoading) {
-                // Populate country dropdown (using experiencesData)
+            // Static data for detailed support
+            const detailedSupportData = {
+                "سوريا": {
+                    "الدعم المالي (تعويضات/رواتب)": "بموجب المرسوم التشريعي رقم 86، تُمنح أسر الشهداء والمفقودين 'بطاقة شرف' توفر لهم مساعدة مالية سنوية قدرها 2000 ليرة سورية. كما يوجد راتب شهري لوالدي الشهيد غير المتزوج، وأموال للدفن.",
+                    "الدعم التعليمي (منح/إعفاءات)": "لا توجد إشارة واضحة في المصادر الموثوقة لدعم تعليمي حكومي مباشر ومحدد لذوي المفقودين في سوريا يتجاوز التسهيلات العامة.",
+                    "الرعاية الصحية والنفسية": "لا توجد إشارة واضحة في المصادر الموثوقة لدعم صحي حكومي مباشر ومحدد لذوي المفقودين في سوريا يتجاوز التسهيلات العامة.",
+                    "دعم التوظيف": "لا توجد إشارة واضحة في المصادر الموثوقة لدعم توظيف حكومي مباشر ومحدد لذوي المفقودين في سوريا.",
+                    "الضمانات القانونية": "لا توجد إشارة واضحة في المصادر الموثوقة لضمانات قانونية حكومية مباشرة ومحددة لذوي المفقودين في سوريا."
+                },
+                "العراق": {
+                    "الدعم المالي (تعويضات/رواتب)": "تُقدم مؤسسة الشهداء راتبًا تقاعديًا مع إمكانية الجمع بين راتبين. لا توجد رسوم لعملية تحديد الهوية.",
+                    "الدعم التعليمي (منح/إعفاءات)": "إعفاء من رسوم الدراسات المسائية وتخفيض أقساط الأهلية، وأولوية 10% للدراسات الجامعية والعليا. إعفاء من جميع الرسوم المدرسية لأبناء الشهداء/الضحايا/المفقودين/المصابين، وإعفاء 50% للمدارس الدولية.",
+                    "الرعاية الصحية والنفسية": "لا توجد إشارة واضحة في المصادر الموثوقة لدعم صحي حكومي عام لذوي المفقودين يتجاوز تكاليف تحديد الهوية.",
+                    "دعم التوظيف": "أولوية في التوظيف والنقل بين الوزارات. إعفاء الأرامل من قواعد الندب والنقل للعمل بالقرب من محل الإقامة، وأولوية للبعثات التعليمية/الإعارات الخارجية.",
+                    "الضمانات القانونية": "للعائلات الحق في الإبلاغ عن المفقودين لدى الشرطة أو وزارة شؤون الشهداء والمؤنفلين أو وزارة الداخلية. دائرة الطب العدلي مسؤولة عن تحديد الهوية بما في ذلك اختبارات الحمض النووي دون رسوم."
+                },
+                "كولومبيا": {
+                    "الدعم المالي (تعويضات/رواتب)": "تعويضات مالية عن الأضرار الاقتصادية، والتي أدت إلى تحسين النتائج الاقتصادية والصحية للمستفيدين.",
+                    "الدعم التعليمي (منح/إعفاءات)": "لا توجد إشارة واضحة لدعم تعليمي حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الرعاية الصحية والنفسية": "رعاية نفسية اجتماعية وصحية شاملة (PAPSIVI) لضحايا النزاع المسلح.",
+                    "دعم التوظيف": "لا توجد إشارة واضحة لدعم توظيف حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الضمانات القانونية": "اللجنة الوطنية للبحث عن الأشخاص المفقودين، السجل الوطني، آلية البحث العاجل. تجريم الاختفاء القسري (القانون 589 لعام 2000). إعلان الغياب بسبب الاختفاء (القانون 1513 لعام 2012)."
+                },
+                "تشيلي": {
+                    "الدعم المالي (تعويضات/رواتب)": "معاش شهري، دفعة لمرة واحدة (معاش 12 شهرًا)، ومبلغ مقطوع للأطفال الذين لا يتلقون معاشًا بسبب العمر (17,000 دولار أمريكي).",
+                    "الدعم التعليمي (منح/إعفاءات)": "منح دراسية للتعليم الثانوي/الجامعي/التقني (تغطي الرسوم الدراسية وبدل شهري). إعفاء من الخدمة العسكرية للأطفال.",
+                    "الرعاية الصحية والنفسية": "رعاية صحية مجانية في النظام الوطني لمن هم تحت خط الفقر. برنامج PRAIS يوفر رعاية طبية عامة، خدمات اجتماعية، ومشورة نفسية.",
+                    "دعم التوظيف": "لا توجد إشارة واضحة لدعم توظيف حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الضمانات القانونية": "دعم تحديد/إعادة الرفات، تكاليف الجنازة. قاعدة بيانات وطنية للحمض النووي لتحديد الهوية."
+                },
+                "الأرجنتين": {
+                    "الدعم المالي (تعويضات/رواتب)": "تعويضات مالية بموجب قوانين محددة (مثل 24.043، 24.411، 25.192، 25.914) توفر مزايا/تعويضات استثنائية لفئات مختلفة من الضحايا/الورثة. مدفوعات شهرية لـ 'جدات بلازا دي مايو' لجهود البحث.",
+                    "الدعم التعليمي (منح/إعفاءات)": "لا توجد إشارة واضحة لدعم تعليمي حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الرعاية الصحية والنفسية": "لا توجد إشارة واضحة لدعم صحي حكومي مباشر ومحدد لذوي المفقودين.",
+                    "دعم التوظيف": "لا توجد إشارة واضحة لدعم توظيف حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الضمانات القانونية": "اللجنة الوطنية لاختفاء الأشخاص (CONADEP) للتحقق من الحقيقة. قاعدة بيانات جينية وطنية لتحديد هوية الأطفال."
+                },
+                "الجزائر": {
+                    "الدعم المالي (تعويضات/رواتب)": "تعويضات مالية لعائلات المفقودين/ضحايا الإرهاب بموجب المرسوم الرئاسي رقم 05-278 (2005).",
+                    "الدعم التعليمي (منح/إعفاءات)": "لا توجد إشارة واضحة لدعم تعليمي حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الرعاية الصحية والنفسية": "لا توجد إشارة واضحة لدعم صحي حكومي مباشر ومحدد لذوي المفقودين.",
+                    "دعم التوظيف": "لا توجد إشارة واضحة لدعم توظيف حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الضمانات القانونية": "لجنة تحقيق خاصة (2003-2005) كلفت بتحديد هوية المفقودين وصياغة خطة تعويضات. لكن قوانين العفو غالبًا ما منحت حصانة، مما أعاق المساءلة والبحث عن الحقيقة."
+                },
+                "لبنان": {
+                    "الدعم المالي (تعويضات/رواتب)": "لا توجد إشارة صريحة لدعم مالي حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الدعم التعليمي (منح/إعفاءات)": "لا توجد إشارة صريحة لدعم تعليمي حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الرعاية الصحية والنفسية": "لا توجد إشارة صريحة لدعم صحي حكومي مباشر ومحدد لذوي المفقودين.",
+                    "دعم التوظيف": "لا توجد إشارة صريحة لدعم توظيف حكومي مباشر ومحدد لذوي المفقودين.",
+                    "الضمانات القانونية": "القانون 105/2018 أنشأ الهيئة الوطنية المستقلة للمفقودين والمخفيين قسراً للتحقيق، وتحديد مواقع الرفات، وإبلاغ العائلات."
+                },
+                "المكسيك": {
+                    "الدعم المالي (تعويضات/رواتب)": "لا توجد إشارات واضحة لدعم حكومي مباشر.",
+                    "الدعم التعليمي (منح/إعفاءات)": "لا توجد إشارات واضحة لدعم حكومي مباشر.",
+                    "الرعاية الصحية والنفسية": "لا توجد إشارات واضحة لدعم حكومي مباشر.",
+                    "دعم التوظيف": "لا توجد إشارات واضحة لدعم حكومي مباشر.",
+                    "الضمانات القانونية": "لا توجد إشارات واضحة لدعم حكومي مباشر."
+                },
+                "سريلانكا": {
+                    "الدعم المالي (تعويضات/رواتب)": "لا توجد إشارات واضحة لدعم مالي حكومي مباشر.",
+                    "الدعم التعليمي (منح/إعفاءات)": "لا توجد إشارات واضحة لدعم تعليمي حكومي مباشر.",
+                    "الرعاية الصحية والنفسية": "تأسيس مكتب شؤون المفقودين (OMP) لتقديم الدعم الشامل للعائلات، بما في ذلك الدعم النفسي والاجتماعي.",
+                    "دعم التوظيف": "لا توجد إشارات واضحة لدعم توظيف حكومي مباشر.",
+                    "الضمانات القانونية": "تأسيس مكتب شؤون المفقودين (OMP) لتقديم الدعم الشامل للعائلات، بما في ذلك الدعم القانوني."
+                },
+                "غواتيمالا": {
+                    "الدعم المالي (تعويضات/رواتب)": "لا توجد إشارات واضحة لدعم حكومي مباشر.",
+                    "الدعم التعليمي (منح/إعفاءات)": "لا توجد إشارات واضحة لدعم حكومي مباشر.",
+                    "الرعاية الصحية والنفسية": "لا توجد إشارات واضحة لدعم حكومي مباشر.",
+                    "دعم التوظيف": "لا توجد إشارات واضحة لدعم حكومي مباشر.",
+                    "الضمانات القانونية": "لا توجد إشارات واضحة لدعم حكومي مباشر."
+                }
+            };
+
+            if (countrySelect && supportTypeSelect && exploreSupportBtn && exploreOutputDiv && exploreResultP) {
+                // Populate country dropdown (using experiencesData) - ensure it includes new countries
+                countrySelect.innerHTML = '<option value="">-- اختر دولة --</option>'; // Clear existing options
                 experiencesData.forEach(exp => {
                     const option = document.createElement('option');
                     option.value = exp.country;
@@ -620,7 +884,7 @@
                 });
                 console.log("Country dropdown populated."); // Log country dropdown populated
 
-                // Populate support type dropdown (these will be the types for the prompt)
+                // Populate support type dropdown (this will be the types for the prompt)
                 const supportTypesForPrompt = [
                     "الدعم المالي (تعويضات/رواتب)",
                     "الدعم التعليمي (منح/إعفاءات)",
@@ -637,58 +901,58 @@
                 console.log("Support type dropdown populated."); // Log support type dropdown populated
 
 
-                exploreSupportBtn.addEventListener('click', async () => {
+                exploreSupportBtn.addEventListener('click', () => {
                     const selectedCountry = countrySelect.value;
                     const selectedSupportType = supportTypeSelect.value;
 
                     exploreOutputDiv.classList.remove('hidden');
-                    exploreResultP.textContent = '';
-                    exploreLoading.classList.remove('hidden');
+                    exploreResultP.textContent = ''; // Clear previous result
 
                     if (!selectedCountry || !selectedSupportType) {
                         exploreResultP.textContent = 'الرجاء اختيار دولة ونوع دعم للاستكشاف.';
-                        exploreLoading.classList.add('hidden');
                         console.log("Detailed support exploration: Missing country or support type."); // Log missing country or support type
                         return;
                     }
 
-                    const prompt = `ما هو الدعم المفصل لـ "${selectedSupportType}" في "${selectedCountry}" لعائلات المفقودين؟ قدم إجابة مفصلة ومباشرة.`;
-
-                    try {
-                        let chatHistory = [];
-                        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                        const payload = { contents: chatHistory };
-                        const apiKey = "AIzaSyCoN4kVD_WDQ5YboGBN46dAgxwgfkBS36M"; 
-                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                        
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const result = await response.json();
-
-                        // Process API response
-                        if (result.candidates && result.candidates.length > 0 &&
-                            result.candidates[0].content && result.candidates[0].content.parts &&
-                            result.candidates[0].content.parts.length > 0) {
-                            const text = result.candidates[0].content.parts[0].text;
-                            exploreResultP.textContent = text;
-                            console.log(`Detailed support description generated for ${selectedCountry} - ${selectedSupportType}`); // Log generated description
-                        } else {
-                            exploreResultP.textContent = `عذراً، لم أتمكن من الحصول على معلومات مفصلة عن "${selectedSupportType}" في "${selectedCountry}" حالياً. يرجى المحاولة مرة أخرى.`;
-                            console.error("Gemini API response structure unexpected or content missing for detailed support exploration."); // Log API response error
-                        }
-                    } catch (error) {
-                        exploreResultP.textContent = `حدث خطأ أثناء استكشاف التفاصيل: ${error.message}`;
-                        console.error("Error fetching detailed support description:", error); // Log fetch error
-                    } finally {
-                        exploreLoading.classList.add('hidden');
-                    }
+                    // Retrieve static data
+                    const resultText = detailedSupportData[selectedCountry] ? 
+                                       detailedSupportData[selectedCountry][selectedSupportType] : 
+                                       `عذراً، لا توجد معلومات مفصلة عن "${selectedSupportType}" في "${selectedCountry}" حالياً.`;
+                    
+                    exploreResultP.textContent = resultText;
+                    console.log(`Detailed support description retrieved for ${selectedCountry} - ${selectedSupportType}`); // Log retrieved description
                 });
                 console.log("Detailed support exploration button event listener attached."); // Log button event listener attached
             } else {
                 console.error("One or more elements for detailed support exploration not found. Detailed support exploration functionality will not work."); // Log missing elements for detailed support exploration
+            }
+
+            // Overlay functionality
+            if (openOverlayBtn && closeOverlayBtn && overlayPage && mainContent) {
+                openOverlayBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    overlayPage.classList.add('active');
+                    mainContent.classList.add('main-content-shifted');
+                    console.log("Overlay opened.");
+                });
+
+                closeOverlayBtn.addEventListener('click', () => {
+                    overlayPage.classList.remove('active');
+                    mainContent.classList.remove('main-content-shifted');
+                    console.log("Overlay closed.");
+                });
+
+                // Close overlay if clicking outside the content (optional, but good UX)
+                overlayPage.addEventListener('click', (e) => {
+                    if (e.target === overlayPage) {
+                        overlayPage.classList.remove('active');
+                        mainContent.classList.remove('main-content-shifted');
+                        console.log("Overlay closed by clicking outside.");
+                    }
+                }
+                );
+            } else {
+                console.error("One or more overlay elements not found. Overlay functionality will not work.");
             }
         }); // End of DOMContentLoaded
     </script>
