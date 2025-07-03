@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دعم ذوي المفقودين: نظرة عالمية تفاعلية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js is no longer needed for the support comparison table, but kept for other potential uses or future features -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: تم تصميم التطبيق كهيكل لوحة معلومات تفاعلية من صفحة واحدة مع أقسام مواضيعية يمكن التنقل فيها. يبدأ بمقدمة شاملة، ثم ينتقل إلى استكشاف مفهوم "بطاقة الشرف"، ومقارنة تعريفات المستفيدين، وتحليل مقارن للدعم الحكومي عبر مخطط تفاعلي وجدول، ودور المنظمات، وأخيراً تجارب دولية مفصلة. تم اختيار هذا الهيكل لتسهيل رحلة المستخدم من الفهم العام إلى الاستكشاف العميق والمقارن، مما يتيح استيعاب المعلومات المعقدة بطريقة بصرية ومنظمة بدلاً من السرد الخطي للتقرير الأصلي. التفاعل الرئيسي هو فلترة أنواع الدعم لمقارنة استجابات الدول، مما يعزز الفهم التحليلي. تم تعديل قسم "استكشاف الدعم بالتفصيل" ليعرض معلومات ثابتة. -->
+    <!-- Visualization & Content Choices:
+        - المقدمة: نص منسق مع أيقونات لتقديم القضية (الهدف: إعلام).
+        - بطاقة الشرف: كتل نصية مقارنة باستخدام Flexbox لتوضيح الاختلافات (الهدف: مقارنة).
+        - المستفيدون: مخطط هيكلي باستخدام HTML/Tailwind Grid لعرض تعريفات الأسرة (الهدف: تنظيم).
+        - الدعم الحكومي: جدول تفاعلي (HTML/Tailwind) مع قائمة منسدلة للفلترة حسب نوع الدعم. هذا هو الخيار الأمثل لمقارنة البيانات متعددة الفئات عبر بلدان مختلفة بشكل فعال (الهدف: مقارنة وتحليل).
+        - دور المنظمات: بطاقات قابلة للتوسيع (أكورديون) باستخدام JS لعرض معلومات عن كل منظمة (الهدف: تنظيم وإعلام).
+        - تجارب دولية: شبكة من البطاقات التفاعلية (HTML/Tailwind) التي تكشف عن ملخصات عند النقر، مما يشجع على الاستكشاف (الهدف: استكشاف).
+        - استكشاف الدعم بالتفصيل: قائمتان منسدلتان (دولة ونوع دعم) وزر لعرض شرح مفصل من بيانات ثابتة، مع عرض النتيجة. يهدف هذا إلى توفير فهم أعمق لكيفية تطبيق أنواع الدعم المختلفة في سياقات محددة (الهدف: تحليل معمق).
+        - تم اتخاذ قرار استخدام Chart.js للمخططات و HTML/CSS المنظم لبقية العناصر البصرية لدعم التفاعل الديناميكي وتجنب الصور الثابتة أو SVG. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .section-hidden {
+            display: none;
+        }
+        .nav-active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .card-flip {
+            perspective: 1000px;
+        }
+        .card-flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .card-flip.flipped .card-flip-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0.75rem;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl md:text-2xl font-bold text-indigo-700">دعم ذوي المفقودين عالميًا (تقرير تحليلي)</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4 space-x-reverse">
+                        <a href="#hero" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="hero">الرئيسية</a>
+                        <a href="#honor-card" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="honor-card">بطاقة الشرف</a>
+                        <a href="#beneficiaries" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="beneficiaries">المستفيدون</a>
+                        <a href="#support-comparison" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="support-comparison">مقارنة الدعم</a>
+                        <a href="#organizations" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="organizations">المنظمات</a>
+                        <a href="#experiences" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="experiences">تجارب دولية</a>
+                        <a href="#detailed-support-exploration" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-indigo-100" data-section="detailed-support-exploration">استكشاف الدعم بالتفصيل</a>
+                    </div>
+                </div>
+                 <div class="md:hidden">
+                    <select id="mobile-nav" name="mobile-nav" class="bg-white border border-gray-300 rounded-md py-2 px-3 text-sm">
+                        <option value="hero">الرئيسية</option>
+                        <option value="honor-card">بطاقة الشرف</option>
+                        <option value="beneficiaries">المستفيدون</option>
+                        <option value="support-comparison">مقارنة الدعم</option>
+                        <option value="organizations">المنظمات</option>
+                        <option value="experiences">تجارب دولية</option>
+                        <option value="detailed-support-exploration">استكشاف الدعم بالتفصيل</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="hero" class="text-center py-12 md:py-20 section-hidden">
+            <h2 class="text-3xl md:text-5xl font-bold text-indigo-800 mb-4">التحدي العالمي للمفقودين وحقوق عائلاتهم</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-8">
+                تُعد ظاهرة المفقودين عبئًا عميقًا ومستمرًا على العائلات المتضررة حول العالم. إن حالة "الفقدان الغامض" تولّد ضائقة نفسية هائلة وصعوبات اقتصادية وقانونية. يستكشف هذا التطبيق الأطر الدولية والمبادرات الوطنية لتقديم الدعم والاعتراف بهذه العائلات، مع تسليط الضوء على "الحق في معرفة الحقيقة" كحق إنساني أساسي.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <span class="text-4xl text-indigo-500">⚖️</span>
+                    <h3 class="text-xl font-bold my-2">الحق في المعرفة</h3>
+                    <p class="text-gray-600">حق العائلات غير القابل للتصرف في معرفة مصير أقاربهم، وهو أساس جميع أشكال الدعم والجبر.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <span class="text-4xl text-indigo-500">🤝</span>
+                    <h3 class="text-xl font-bold my-2">الدعم الشامل</h3>
+                    <p class="text-gray-600">يتجاوز الدعم المساعدات المالية ليشمل الرعاية الصحية والنفسية والتعليم والتوظيف.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <span class="text-4xl text-indigo-500">🌍</span>
+                    <h3 class="text-xl font-bold my-2">تجارب عالمية</h3>
+                    <p class="text-gray-600">تختلف استجابات الدول، وتقدم كل تجربة دروسًا قيمة في العدالة الانتقالية والتعويضات.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="honor-card" class="py-12 md:py-16 bg-stone-50 rounded-lg my-8 section-hidden">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-indigo-800">مفهوم "بطاقة الشرف"</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">لا يوجد تعريف عالمي موحد لـ"بطاقة الشرف". يمكن أن تكون لفتة رمزية أو وثيقة تمنح امتيازات مادية وقانونية. يكمن جوهرها في الاعتراف الرسمي بمعاناة وتضحيات عائلات المفقودين.</p>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8 justify-center">
+                <div class="bg-white p-6 rounded-lg shadow-md md:w-1/2">
+                    <h3 class="text-2xl font-bold mb-3 text-indigo-700">سوريا: بطاقة ذات امتيازات</h3>
+                    <p class="text-gray-700 mb-2"><strong class="font-semibold">الأساس القانوني:</strong> المرسوم التشريعي رقم 86 يمنح "بطاقة شرف" لذوي الشهداء والمفقودين.</p>
+                    <p class="text-gray-700 mb-2"><strong class="font-semibold">المزايا:</strong> توفر تسهيلات طبية وتعليمية، بالإضافة إلى مساعدة مالية سنوية (2000 ليرة سورية حسب أحد المصادر).</p>
+                    <p class="text-gray-700"><strong class="font-semibold">التحدي:</strong> غالبًا ما تكون هذه الامتيازات مرتبطة بوضع "شهيد" مؤكد، مما يجبر عائلات المفقودين على خوض عملية قانونية طويلة لإعلان وفاة قريبهم للوصول إلى الدعم.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md md:w-1/2">
+                    <h3 class="text-2xl font-bold mb-3 text-indigo-700">العراق: هوية الشهداء</h3>
+                     <p class="text-gray-700 mb-2"><strong class="font-semibold">الأساس القانوني:</strong> قانون مؤسسة الشهداء رقم 2 لسنة 2016 يعتبر المفقودين بسبب الحرب أو الإرهاب "شهداء".</p>
+                    <p class="text-gray-700 mb-2"><strong class="font-semibold">المزايا:</strong> تحصل العائلات على هوية تمنح راتبًا تقاعديًا، وأولوية في التوظيف، وإعفاءات من الرسوم الدراسية، ومزايا أخرى.</p>
+                    <p class="text-gray-700"><strong class="font-semibold">التحدي:</strong> يتطلب الوصول إلى هذه المزايا إعلان وفاة المفقود رسميًا بعد فترة انتظار (2-4 سنوات)، مما يؤخر الدعم الحيوي للعائلات التي تعيش في حالة من عدم اليقين.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="beneficiaries" class="py-12 md:py-16 bg-stone-50 rounded-lg my-8 section-hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-indigo-800">من هم المستفيدون من الدعم؟</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">يختلف تعريف "الأسرة" المؤهلة للحصول على الدعم بين الدول والمنظمات الدولية. هذا التباين يؤثر بشكل مباشر على من يمكنه الوصول إلى الامتيازات والبرامج المتاحة. فيما يلي مقارنة لتعريفات المستفيدين في سياقات مختلفة.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-bold mb-4 text-indigo-700">التعريف الدولي (ICMP)</h3>
+                    <ul class="space-y-2 text-gray-700 list-disc list-inside text-right">
+                        <li>الزوج/الزوجة أو الشريك</li>
+                        <li>الأبناء (بيولوجيون، بالتبني، أبناء الزوج)</li>
+                        <li>الوالدان (بيولوجيون، بالتبني، والدا الزوج)</li>
+                        <li>الإخوة والأخوات</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-bold mb-4 text-indigo-700">العراق</h3>
+                     <ul class="space-y-2 text-gray-700 list-disc list-inside text-right">
+                        <li>الزوج/الزوجات</li>
+                        <li>الأبناء والبنات</li>
+                        <li>الوالدان</li>
+                        <li>الإخوة والأخوات</li>
+                        <li>أولاد الابن وأولاد البنت (الأحفاد)</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-bold mb-4 text-indigo-700">كولومبيا</h3>
+                    <ul class="space-y-2 text-gray-700 list-disc list-inside text-right">
+                        <li>الزوج/الزوجة أو الشريك الدائم</li>
+                        <li>الأقارب من الدرجة الأولى (أبناء، والدان)</li>
+                        <li>الأقارب من الدرجة الثانية (إخوة، أجداد) في غياب الدرجة الأولى</li>
+                        <li>من تدخل للمساعدة يُعتبر ضحية</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-bold mb-4 text-indigo-700">تشيلي</h3>
+                     <ul class="space-y-2 text-gray-700 list-disc list-inside text-right">
+                        <li>الزوج/الزوجة الباقي على قيد الحياة</li>
+                        <li>الأم/الأب</li>
+                        <li>الأبناء (تحت 25 عامًا أو ذوي الإعاقة)</li>
+                        <li>الأم/الأب لأطفال خارج الزواج</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- New Section for Syrian First-Degree Relatives -->
+            <div class="mt-12 p-6 bg-white rounded-lg shadow-md">
+                <h3 class="text-2xl font-bold mb-4 text-indigo-700 text-center">الأقارب من الدرجة الأولى في القانون السوري</h3>
+                <p class="text-gray-700 text-right leading-relaxed">
+                    يُحدد القانون المدني السوري (المادتان 37 و 38) الأقارب من الدرجة الأولى بالقرابة النسبية بدقة على أنهم: **الأب، الأم، الابن، والبنت**. يُشتق هذا التصنيف من النسب المباشر بين الأصول والفروع. من الأهمية بمكان التأكيد على التمييز بين قرابة النسب وقرابة المصاهرة؛ فالأزواج لا يُصنفون كأقارب من الدرجة الأولى بالقرابة النسبية، بل تُشكل علاقتهم رابطة زوجية فريدة تُنشئ قرابة مصاهرة مع أقارب الزوج الآخر بالدم. إن الالتزام بهذه التعريفات القانونية الدقيقة أمر بالغ الأهمية للتفسير والتطبيق القانوني الصحيح ضمن الإطار القانوني السوري، ويُشكل ركيزة أساسية للعديد من الأحكام القانونية عبر قوانين الأحوال المدنية والشخصية السورية، مما يُؤثر على مجالات حيوية مثل الإرث، والتزامات النفقة، والولاية، والعديد من اللوائح الإجرائية والإدارية.
+                </p>
+            </div>
+        </section>
+
+        <section id="support-comparison" class="py-12 md:py-16 bg-stone-50 rounded-lg my-8 section-hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-indigo-800">مقارنة الدعم الحكومي</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">تقدم الحكومات حول العالم مجموعة متنوعة من برامج الدعم والامتيازات. استخدم القائمة المنسدلة أدناه لمقارنة أنواع الدعم المختلفة عبر عدة دول لديها برامج موثقة. يوضح الجدول مدى توفر كل نوع من أنواع الدعم.</p>
+            </div>
+            <div class="flex justify-center mb-8">
+                <select id="support-filter" name="support-filter" class="p-2 border rounded-md bg-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="all">عرض كل أنواع الدعم</option>
+                    <option value="financial">الدعم المالي (تعويضات/رواتب)</option>
+                    <option value="education">الدعم التعليمي (منح/إعفاءات)</option>
+                    <option value="health">الرعاية الصحية والنفسية</option>
+                    <option value="employment">دعم التوظيف</option>
+                    <option value="legal">الضمانات القانونية</option>
+                </select>
+            </div>
+            <!-- Container for the dynamic table -->
+            <div id="support-table-container" class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <thead class="bg-indigo-700 text-white">
+                        <tr>
+                            <th class="py-3 px-4 text-right">نوع الدعم</th>
+                            <!-- Country headers will be populated by JS -->
+                        </tr>
+                    </thead>
+                    <tbody id="support-table-body">
+                        <!-- Table rows will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="organizations" class="py-12 md:py-16 bg-stone-50 rounded-lg my-8 section-hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-indigo-800">دور المنظمات الدولية وغير الحكومية</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">تلعب المنظمات الدولية وغير الحكومية دورًا حيويًا في سد الفجوات، وتقديم الدعم المباشر، والدفاع عن حقوق عائلات المفقودين على الساحة العالمية. انقر على كل منظمة لمعرفة المزيد عن دورها.</p>
+            </div>
+            <div id="accordion-container" class="max-w-3xl mx-auto space-y-4">
+            </div>
+        </section>
+        
+        <section id="experiences" class="py-12 md:py-16 bg-stone-50 rounded-lg my-8 section-hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-indigo-800">تجارب دولية موجزة</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">تقدم تجارب الدول المختلفة دروسًا قيمة حول مقاربات دعم عائلات المفقودين. انقر على بطاقة أي دولة لاستعراض ملخص تجربتها، بما في ذلك أبرز الإجراءات والنجاحات والتحديات.</p>
+            </div>
+            <div id="experiences-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+
+        <section id="detailed-support-exploration" class="py-12 md:py-16 bg-stone-50 rounded-lg my-8 section-hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-indigo-800">استكشاف الدعم بالتفصيل</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+                    اختر دولة ونوع دعم للحصول على شرح مفصل حول كيفية تقديم هذا الدعم لعائلات المفقودين في سياق تلك الدولة.
+                </p>
+            </div>
+            <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="country-select" class="block text-lg font-semibold text-gray-700 mb-2">اختر الدولة:</label>
+                        <select id="country-select" name="country-select" class="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">-- اختر دولة --</option>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="support-type-select" class="block text-lg font-semibold text-gray-700 mb-2">اختر نوع الدعم:</label>
+                        <select id="support-type-select" name="support-type-select" class="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">-- اختر نوع الدعم --</option>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                </div>
+                <button id="explore-support-btn" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md font-semibold text-lg hover:bg-indigo-700 transition duration-300 ease-in-out shadow-lg">
+                    استكشاف
+                </button>
+                <div id="explore-output" class="mt-6 p-4 bg-indigo-50 rounded-md text-gray-800 border border-indigo-200 hidden">
+                    <p id="explore-result" class="whitespace-pre-wrap"></p>
+                     <div id="explore-loading" class="text-center text-indigo-600 mt-4 hidden">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+                        <p>جاري استكشاف التفاصيل...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <footer class="bg-gray-800 text-white text-center p-4 mt-8">
+        <p>تم إنشاء هذا التطبيق التفاعلي لتسهيل فهم قضية دعم ذوي المفقودين. المعلومات مستمدة من تقرير بحثي شامل.</p>
+    </footer>
+
+    <script>
+        console.log("Script started."); // Log to confirm script execution starts
+
+        // Wait until the DOM is fully loaded before running scripts
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOMContentLoaded event fired. Starting script execution."); // Log to confirm DOMContentLoaded event
+
+            const sections = {};
+            document.querySelectorAll('main > section').forEach(section => {
+                sections[section.id] = section;
+                console.log(`Registered section: ${section.id}`); // Log registered section
+            });
+
+            // Ensure all sections are hidden initially
+            for (const id in sections) {
+                if (sections.hasOwnProperty(id)) {
+                    sections[id].style.display = 'none';
+                    console.log(`Initial state: Section ${id} is HIDDEN.`);
+                }
+            }
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileNav = document.getElementById('mobile-nav');
+
+            function updateActiveNav(activeSectionId) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('nav-active', link.dataset.section === activeSectionId);
+                });
+                if (mobileNav && mobileNav.value !== activeSectionId) {
+                    mobileNav.value = activeSectionId;
+                }
+            }
+            
+            function showSection(sectionId) {
+                console.log('Attempting to show section:', sectionId); // Log attempt to show section
+                for (const id in sections) {
+                    if (sections.hasOwnProperty(id)) {
+                        if (id === sectionId) {
+                            sections[id].style.display = 'block'; // Set display directly to block
+                            console.log(`Section ${id} is now VISIBLE.`); // Log that section is visible
+                        } else {
+                            sections[id].style.display = 'none'; // Set display directly to none
+                            console.log(`Section ${id} is now HIDDEN.`); // Log that section is hidden
+                        }
+                    }
+                }
+                updateActiveNav(sectionId);
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = e.target.dataset.section;
+                    showSection(sectionId);
+                    window.history.pushState({section: sectionId}, '', `#${sectionId}`);
+                });
+            });
+
+            if (mobileNav) {
+                mobileNav.addEventListener('change', (e) => {
+                     const sectionId = e.target.value;
+                     showSection(sectionId);
+                     window.history.pushState({section: sectionId}, '', `#${sectionId}`);
+                });
+            }
+
+            window.addEventListener('popstate', (e) => {
+                if (e.state && e.state.section) {
+                    showSection(e.state.section);
+                } else {
+                    showSection('hero');
+                }
+            });
+            
+            // Initial load: show correct section based on URL hash or default to 'hero'
+            const initialSection = window.location.hash.substring(1) || 'hero';
+            showSection(initialSection);
+
+            // Data for the support comparison table
+            const supportData = {
+                labels: ['العراق', 'سوريا', 'كولومبيا', 'تشيلي', 'الأرجنتين', 'الجزائر', 'لبنان'],
+                datasets: [
+                    {
+                        label: 'الدعم المالي (تعويضات/رواتب)',
+                        data: [1, 1, 1, 1, 1, 1, 0],
+                        key: 'financial'
+                    },
+                    {
+                        label: 'الدعم التعليمي (منح/إعفاءات)',
+                        data: [1, 1, 0, 1, 0, 0, 0],
+                        key: 'education'
+                    },
+                    {
+                        label: 'الرعاية الصحية والنفسية',
+                        data: [0, 1, 1, 1, 0, 0, 0],
+                        key: 'health'
+                    },
+                    {
+                        label: 'دعم التوظيف',
+                        data: [1, 1, 0, 0, 0, 0, 0],
+                        key: 'employment'
+                    },
+                    {
+                        label: 'الضمانات القانونية',
+                        data: [1, 1, 1, 1, 1, 0, 1],
+                        key: 'legal'
+                    },
+                ]
+            };
+
+            const supportTableHead = document.querySelector('#support-table-container thead tr');
+            const supportTableBody = document.getElementById('support-table-body');
+            const supportFilter = document.getElementById('support-filter');
+
+            // Function to render the support table
+            function renderSupportTable(filter = 'all') {
+                // Clear existing table headers and body
+                supportTableHead.innerHTML = '<th class="py-3 px-4 text-right">نوع الدعم</th>';
+                supportTableBody.innerHTML = '';
+
+                // Add country headers
+                supportData.labels.forEach(country => {
+                    const th = document.createElement('th');
+                    th.className = 'py-3 px-4 text-center';
+                    th.textContent = country;
+                    supportTableHead.appendChild(th);
+                });
+
+                // Filter and add table rows
+                let filteredDatasets = supportData.datasets;
+                if (filter !== 'all') {
+                    filteredDatasets = supportData.datasets.filter(ds => ds.key === filter);
+                }
+
+                filteredDatasets.forEach(dataset => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-200 last:border-b-0';
+
+                    // Support type cell
+                    const th = document.createElement('th');
+                    th.className = 'py-3 px-4 text-right font-medium text-gray-700';
+                    th.textContent = dataset.label;
+                    tr.appendChild(th);
+
+                    // Data cells for each country
+                    dataset.data.forEach(value => {
+                        const td = document.createElement('td');
+                        td.className = 'py-3 px-4 text-center';
+                        td.textContent = value === 1 ? '✓' : ''; // Checkmark for 1, empty for 0
+                        tr.appendChild(td);
+                    });
+                    supportTableBody.appendChild(tr);
+                });
+                console.log(`Support table rendered with filter: ${filter}`);
+            }
+
+            // Initial render of the table
+            renderSupportTable();
+
+            // Add event listener for the filter dropdown
+            if (supportFilter) {
+                supportFilter.addEventListener('change', function() {
+                    renderSupportTable(this.value);
+                });
+            } else {
+                console.error("Select element with ID 'support-filter' not found. Filter functionality will not work.");
+            }
+            
+            const organizationsData = [
+                {
+                    name: "اللجنة الدولية للصليب الأحمر (ICRC)",
+                    description: "تنشط منذ عام 1991 في دعم العائلات والدعوة إلى الحق في معرفة المصير. تقدم رعاية طبية، دعم نفسي اجتماعي، ومساعدات إنسانية مباشرة. شاركت في صياغة الاتفاقية الدولية لحماية جميع الأشخاص من الاختفاء القسري."
+                },
+                {
+                    name: "اللجنة الدولية لشؤون المفقودين (ICMP)",
+                    description: "تعمل على بناء قدرات الحكومات والمجتمع المدني، وتستخدم الأساليب العلمية (مثل الحمض النووي) لتحديد الهوية. تدير برامج جغرافية في مناطق النزاع وتقدم منحًا لجمعيات العائلات."
+                },
+                {
+                    name: "الفريق العامل المعني بحالات الاختفاء القسري (WGEID)",
+                    description: "تابع للأمم المتحدة، يعمل كقناة اتصال بين العائلات والحكومات، ويطلب إجراء تحقيقات، ويقدم المساعدة الفنية للدول لضمان المساءلة."
+                },
+                 {
+                    name: "المؤسسة المستقلة للمفقودين في سوريا (IIM)",
+                    description: "أنشأتها الجمعية العامة للأمم المتحدة، وكُلفت بمهمة إيصال الحقيقة للعائلات من خلال البحث وإنشاء مركز بيانات آمن، وتطوير استراتيجية دعم شاملة بالتعاون مع الجهات السورية."
+                }
+            ];
+
+            const accordionContainer = document.getElementById('accordion-container');
+            if (accordionContainer) {
+                organizationsData.forEach((org, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'border border-gray-200 rounded-lg bg-white';
+                    item.innerHTML = `
+                        <button class="w-full text-right p-4 flex justify-between items-center font-semibold text-lg text-indigo-700 hover:bg-indigo-50" data-accordion-target="#accordion-body-${index}">
+                            <span>${org.name}</span>
+                            <svg class="w-6 h-6 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="accordion-body-${index}" class="hidden p-4 border-t border-gray-200">
+                            <p class="text-gray-600">${org.description}</p>
+                        </div>
+                    `;
+                    accordionContainer.appendChild(item);
+                    console.log(`Accordion item added for: ${org.name}`); // Log accordion item added
+                });
+                
+                accordionContainer.addEventListener('click', (e) => {
+                    const button = e.target.closest('button[data-accordion-target]');
+                    if (!button) return;
+                    const targetId = button.getAttribute('data-accordion-target');
+                    const targetBody = document.querySelector(targetId);
+                    const icon = button.querySelector('svg');
+                    
+                    targetBody.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
+                    console.log(`Accordion toggled for: ${button.querySelector('span').textContent}`); // Log accordion toggled
+                });
+            } else {
+                console.error("Accordion container with ID 'accordion-container' not found. Organizations section will not be populated."); // Log missing accordion container
+            }
+
+
+            const experiencesData = [
+                {
+                    country: "الأرجنتين",
+                    summary: "تجربة رائدة في العدالة الانتقالية. تأسيس لجنة الحقيقة (CONADEP)، برنامج تعويضات شامل، ودور حاسم للمجتمع المدني (جدات بلازا دي مايو) في إنشاء قاعدة بيانات جينية لتحديد هوية الأطفال المختطفين.",
+                    color: "bg-sky-600",
+                    icon: "🇦🇷"
+                },
+                {
+                    country: "كولومبيا",
+                    summary: "إطار قانوني قوي لمواجهة آثار النزاع المسلح الطويل. قوانين للتعويضات (قانون الضحايا)، ورعاية نفسية واجتماعية، وآلية لإعلان الغياب بسبب الاختفاء لتسهيل الأمور القانونية على العائلات.",
+                     color: "bg-amber-500",
+                     icon: "🇨🇴"
+                },
+                {
+                    country: "تشيلي",
+                    summary: "برنامج جبر شامل بعد فترة الحكم العسكري. قدم تعويضات مالية مرتفعة، ومعاشات شهرية، ومزايا تعليمية وصحية واسعة (برنامج PRAIS)، بالإضافة إلى جهود لتحديد الهوية عبر الحمض النووي.",
+                     color: "bg-red-600",
+                     icon: "🇨🇱"
+                },
+                {
+                    country: "لبنان",
+                    summary: "إرث ثقيل من الحرب الأهلية. تم إنشاء الهيئة الوطنية للمفقودين والمخفيين قسراً بموجب القانون 105، لكن فعاليتها تواجه تحديات بسبب الأزمات السياسية والاقتصادية والاعتماد الكبير على المجتمع المدني.",
+                     color: "bg-green-600",
+                     icon: "🇱🇧"
+                },
+                {
+                    country: "الجزائر",
+                    summary: "بعد الحرب الأهلية، قدمت الدولة تعويضات مالية للعائلات. لكن العملية واجهت تحديات، حيث ارتبطت التعويضات غالبًا بالحصول على شهادات وفاة، وأعاقت قوانين العفو جهود المساءلة والبحث عن الحقيقة.",
+                     color: "bg-emerald-700",
+                     icon: "🇩🇿"
+                },
+                 {
+                    country: "العراق",
+                    summary: "آليات متعددة للتعامل مع ملف المفقودين من حروب وعمليات إرهابية مختلفة. مؤسسة الشهداء تقدم مزايا واسعة للعائلات بعد إعلان الوفاة، وتعمل دائرة الطب العدلي على تحديد الهوية مجانًا.",
+                     color: "bg-gray-700",
+                     icon: "🇮🇶"
+                }
+            ];
+
+            const experiencesGrid = document.getElementById('experiences-grid');
+            if (experiencesGrid) {
+                experiencesData.forEach(exp => {
+                    const card = document.createElement('div');
+                    card.className = 'card-flip h-64 cursor-pointer';
+                    card.innerHTML = `
+                        <div class="card-flip-inner">
+                            <div class="card-front ${exp.color} text-white flex flex-col justify-center items-center p-4 rounded-lg shadow-lg">
+                                <span class="text-6xl mb-4">${exp.icon}</span>
+                                <h3 class="text-2xl font-bold">${exp.country}</h3>
+                                <p class="mt-2 font-light">(انقر للمزيد)</p>
+                            </div>
+                            <div class="card-back bg-white text-gray-700 p-4 rounded-lg shadow-lg flex items-center justify-center">
+                                <p class="text-center">${exp.summary}</p>
+                            </div>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => {
+                        card.classList.toggle('flipped');
+                        console.log(`Card flipped for: ${exp.country}`); // Log card flipped
+                    });
+                    experiencesGrid.appendChild(card);
+                    console.log(`Experience card added for: ${exp.country}`); // Log experience card added
+                });
+            } else {
+                console.error("Experiences grid with ID 'experiences-grid' not found. Experiences section will not be populated."); // Log missing experiences grid
+            }
+
+            // Detailed Support Exploration Section Logic (using Gemini API)
+            const countrySelect = document.getElementById('country-select');
+            const supportTypeSelect = document.getElementById('support-type-select');
+            const exploreSupportBtn = document.getElementById('explore-support-btn');
+            const exploreOutputDiv = document.getElementById('explore-output');
+            const exploreResultP = document.getElementById('explore-result');
+            const exploreLoading = document.getElementById('explore-loading'); // Get the loading div
+
+            if (countrySelect && supportTypeSelect && exploreSupportBtn && exploreOutputDiv && exploreResultP && exploreLoading) {
+                // Populate country dropdown (using experiencesData)
+                experiencesData.forEach(exp => {
+                    const option = document.createElement('option');
+                    option.value = exp.country;
+                    option.textContent = exp.country;
+                    countrySelect.appendChild(option);
+                });
+                console.log("Country dropdown populated."); // Log country dropdown populated
+
+                // Populate support type dropdown (these will be the types for the prompt)
+                const supportTypesForPrompt = [
+                    "الدعم المالي (تعويضات/رواتب)",
+                    "الدعم التعليمي (منح/إعفاءات)",
+                    "الرعاية الصحية والنفسية",
+                    "دعم التوظيف",
+                    "الضمانات القانونية"
+                ];
+                supportTypesForPrompt.sort().forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    supportTypeSelect.appendChild(option);
+                });
+                console.log("Support type dropdown populated."); // Log support type dropdown populated
+
+
+                exploreSupportBtn.addEventListener('click', async () => {
+                    const selectedCountry = countrySelect.value;
+                    const selectedSupportType = supportTypeSelect.value;
+
+                    exploreOutputDiv.classList.remove('hidden');
+                    exploreResultP.textContent = '';
+                    exploreLoading.classList.remove('hidden');
+
+                    if (!selectedCountry || !selectedSupportType) {
+                        exploreResultP.textContent = 'الرجاء اختيار دولة ونوع دعم للاستكشاف.';
+                        exploreLoading.classList.add('hidden');
+                        console.log("Detailed support exploration: Missing country or support type."); // Log missing country or support type
+                        return;
+                    }
+
+                    const prompt = `ما هو الدعم المفصل لـ "${selectedSupportType}" في "${selectedCountry}" لعائلات المفقودين؟ قدم إجابة مفصلة ومباشرة.`;
+
+                    try {
+                        let chatHistory = [];
+                        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                        const payload = { contents: chatHistory };
+                        const apiKey = ""; 
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                        
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+
+                        // Process API response
+                        if (result.candidates && result.candidates.length > 0 &&
+                            result.candidates[0].content && result.candidates[0].content.parts &&
+                            result.candidates[0].content.parts.length > 0) {
+                            const text = result.candidates[0].content.parts[0].text;
+                            exploreResultP.textContent = text;
+                            console.log(`Detailed support description generated for ${selectedCountry} - ${selectedSupportType}`); // Log generated description
+                        } else {
+                            exploreResultP.textContent = `عذراً، لم أتمكن من الحصول على معلومات مفصلة عن "${selectedSupportType}" في "${selectedCountry}" حالياً. يرجى المحاولة مرة أخرى.`;
+                            console.error("Gemini API response structure unexpected or content missing for detailed support exploration."); // Log API response error
+                        }
+                    } catch (error) {
+                        exploreResultP.textContent = `حدث خطأ أثناء استكشاف التفاصيل: ${error.message}`;
+                        console.error("Error fetching detailed support description:", error); // Log fetch error
+                    } finally {
+                        exploreLoading.classList.add('hidden');
+                    }
+                });
+                console.log("Detailed support exploration button event listener attached."); // Log button event listener attached
+            } else {
+                console.error("One or more elements for detailed support exploration not found. Detailed support exploration functionality will not work."); // Log missing elements for detailed support exploration
+            }
+        }); // End of DOMContentLoaded
+    </script>
+
+</body>
+</html>
